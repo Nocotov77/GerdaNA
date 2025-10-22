@@ -1,0 +1,103 @@
+---
+title: "Анализ частоты слов в книгах Джейн Остин"
+author: "Герда"
+date: "2025-10-22"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+# Загрузка необходимых пакетов
+library(janeaustenr)
+library(stringr)
+library(purrr)
+
+# Функции из задания
+extract_words <- function(book_name) {
+  text <- subset(austen_books(), book == book_name)$text
+  str_extract_all(text, boundary("word")) %>% unlist %>% tolower
+}
+
+janeausten_words <- function() {
+  books <- austen_books()$book %>% unique %>% as.character
+  words <- sapply(books, extract_words) %>% unlist
+  words
+}
+
+max_frequency <- function(letter, words, min_length = 1) {
+  w <- select_words(letter, words = words, min_length = min_length)
+  frequency <- table(w)
+  frequency[which.max(frequency)]
+}
+
+select_words <- function(letter, words, min_length = 1) {
+  min_length_words <- words[nchar(words) >= min_length]
+  grep(paste0("^", letter), min_length_words, value = TRUE)
+}
+```
+
+## Анализ наиболее часто встречающихся слов
+
+```{r analysis}
+# Создаем вектор слов из книг Джейн Остин
+words_vector <- janeausten_words()
+
+# Создаем именованный вектор с максимальной частотой слов для каждой буквы
+# Используем sapply для применения функции max_frequency к каждой букве алфавита
+max_freq_vector <- sapply(letters, max_frequency, 
+                         words = words_vector, min_length = 5)
+
+# Просмотр результатов
+print("Максимальные частоты по буквам:")
+print(max_freq_vector)
+```
+
+## Визуализация результатов
+
+```{r visualization, fig.height=8, fig.width=12}
+# Создаем barplot с подписями
+par(mar = c(8, 4, 4, 2)) # Увеличиваем нижнее поле для подписей
+
+barplot(max_freq_vector, 
+        main = "Наиболее часто встречающиеся слова в книгах Джейн Остин\n(длина слова ≥ 5 букв)",
+        xlab = "", 
+        ylab = "Частота",
+        col = "lightblue",
+        border = "darkblue",
+        las = 2,  # Вертикальные подписи по оси X
+        cex.names = 0.8)
+
+# Добавляем сетку для лучшей читаемости
+grid(nx = NA, ny = NULL, col = "gray", lty = "dotted")
+
+# Добавляем заголовок оси X
+mtext("Буквы английского алфавита", side = 1, line = 6)
+```
+
+## Дополнительная информация
+
+```{r additional-info}
+# Общая статистика
+cat("Общее количество слов в анализе:", length(words_vector), "\n")
+cat("Количество уникальных слов:", length(unique(words_vector)), "\n")
+cat("Минимальная длина слова:", min(nchar(words_vector)), "\n")
+cat("Максимальная длина слова:", max(nchar(words_vector)), "\n")
+
+# Буквы с самой высокой и самой низкой частотой
+max_letter <- letters[which.max(max_freq_vector)]
+min_letter <- letters[which.min(max_freq_vector)]
+
+cat("Буква с самой высокой максимальной частотой:", max_letter, "(", max(max_freq_vector), ")\n")
+cat("Буква с самой низкой максимальной частотой:", min_letter, "(", min(max_freq_vector), ")\n")
+```
+
+### Интерпретация результатов
+
+На графике представлены **максимальные частоты встречаемости слов** для каждой буквы английского алфавита в произведениях Джейн Остин. Анализ ограничен словами длиной **не менее 5 букв**.
+
+**Ключевые наблюдения:**
+- Буква **`r names(which.max(max_freq_vector))`** имеет самое часто встречающееся слово с частотой `r max(max_freq_vector)`
+- Буква **`r names(which.min(max_freq_vector))`** имеет наименее часто встречающееся слово среди максимальных частот
+- Распределение частот демонстрирует особенности лексики автора
+
+*Анализ выполнен с использованием пакетов `janeaustenr` и `stringr`*

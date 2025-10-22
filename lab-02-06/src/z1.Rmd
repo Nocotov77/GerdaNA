@@ -1,0 +1,245 @@
+---
+title: "Динамический анализ данных с R Markdown"
+author: "Аналитик данных"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    css: styles.css
+    toc: true
+    toc_float: true
+---
+
+```{=html}
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid #667eea;
+}
+
+.code-chunk {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+.result {
+  background: #edf2f7;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+.highlight {
+  background-color: #fff3cd;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.table-custom {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.table-custom th {
+  background-color: #4a5568;
+  color: white;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.table-custom td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table-custom tr:nth-child(even) {
+  background-color: #f7fafc;
+}
+
+.plot-container {
+  text-align: center;
+  margin: 2rem 0;
+}
+</style>
+```
+
+::: header
+\#
+
+<center>Анализ данных о фильмах Star Wars</center>
+
+<center>*Динамический отчет с использованием R Markdown*</center>
+:::
+
+## Введение
+
+Этот документ демонстрирует возможности **R Markdown** для создания динамических отчетов. Мы проанализируем данные о фильмах **Star Wars** из пакета `repurrrsive`.
+
+Текущая дата: `r Sys.Date()`
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(repurrrsive)
+library(purrr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+Общее количество фильмов в базе: `r length(sw_films)`
+
+## Основная информация о фильмах
+
+```{r films-info}
+films_df <- map_dfr(sw_films, ~{
+  data.frame(
+    Название = .x$title,
+    Режиссер = .x$director,
+    Продюсер = .x$producer,
+    `Дата выхода` = .x$release_date,
+    `Количество персонажей` = length(.x$characters),
+    `Количество планет` = length(.x$planets),
+    stringsAsFactors = FALSE
+  )
+})
+
+kable(films_df, caption = "Информация о фильмах Star Wars")
+```
+
+Самый ранний фильм вышел: `r min(films_df$Дата.выхода)`
+
+Самый поздний фильм вышел: `r max(films_df$Дата.выхода)`
+
+Среднее количество персонажей в фильме: `r round(mean(films_df$Количество.персонажей), 1)`
+
+## Анализ персонажей
+
+```{r characters-analysis, fig.height=6, fig.width=10}
+character_counts <- films_df$Количество.персонажей
+names(character_counts) <- films_df$Название
+
+ggplot(films_df, aes(x = reorder(Название, Количество.персонажей), y = Количество.персонажей)) +
+  geom_bar(stat = "identity", fill = "#667eea", alpha = 0.8) +
+  geom_text(aes(label = Количество.персонажей), vjust = -0.5, size = 4) +
+  labs(
+    title = "Количество персонажей по фильмам Star Wars",
+    x = "Название фильма",
+    y = "Количество персонажей"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold")
+  )
+```
+
+::: section
+### Ключевые выводы по персонажам
+
+Фильм с наибольшим количеством персонажей: **`r names(which.max(character_counts))`** (`r max(character_counts)` персонажей)
+
+Фильм с наименьшим количеством персонажей: **`r names(which.min(character_counts))`** (`r min(character_counts)` персонажей)
+
+Разница между максимальным и минимальным количеством персонажей составляет: `r max(character_counts) - min(character_counts)`
+:::
+
+## Детальный анализ по режиссерам
+
+```{r directors-analysis}
+directors_summary <- films_df %>%
+  group_by(Режиссер) %>%
+  summarise(
+    `Количество фильмов` = n(),
+    `Общее количество персонажей` = sum(Количество.персонажей),
+    `Среднее количество персонажей` = round(mean(Количество.персонажей), 1),
+    .groups = 'drop'
+  )
+
+kable(directors_summary, caption = "Статистика по режиссерам")
+```
+
+Всего уникальных режиссеров: `r nrow(directors_summary)`
+
+Режиссер с наибольшим количеством фильмов: **`r directors_summary$Режиссер[which.max(directors_summary$Количество.фильмов)]`**
+
+## Временной анализ
+
+```{r time-analysis, fig.height=6, fig.width=10}
+films_df$Год <- as.numeric(substr(films_df$Дата.выхода, 1, 4))
+
+ggplot(films_df, aes(x = Год, y = Количество.персонажей)) +
+  geom_point(size = 4, color = "#e53e3e") +
+  geom_smooth(method = "lm", se = FALSE, color = "#3182ce", linetype = "dashed") +
+  geom_text(aes(label = Название), vjust = -1, size = 3) +
+  labs(
+    title = "Динамика количества персонажей по годам",
+    x = "Год выпуска",
+    y = "Количество персонажей"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"))
+```
+
+::: section
+### Статистические показатели
+
+Средний год выпуска: `r round(mean(films_df$Год), 1)`
+
+Стандартное отклонение: `r round(sd(films_df$Год), 2)`
+
+Коэффициент корреляции между годом и количеством персонажей: `r round(cor(films_df$Год, films_df$Количество.персонажей), 3)`
+:::
+
+## Интерактивные расчеты
+
+```{r interactive-calc}
+calculate_character_density <- function(film_title) {
+  film <- films_df[films_df$Название == film_title, ]
+  density <- film$Количество.персонажей / (2023 - film$Год)
+  return(round(density, 3))
+}
+```
+
+::: result
+### Примеры расчетов:
+
+Для фильма **"`r films_df$Название[1]`"**: - Год выпуска: `r films_df$Год[1]` - Количество персонажей: `r films_df$Количество.персонажей[1]` - "Плотность" персонажей: `r calculate_character_density(films_df$Название[1])`
+
+Для фильма **"`r films_df$Название[4]`"**: - Год выпуска: `r films_df$Год[4]` - Количество персонажей: `r films_df$Количество.персонажей[4]` - "Плотность" персонажей: `r calculate_character_density(films_df$Название[4])`
+:::
+
+## Заключение
+
+[Этот динамический отчет демонстрирует]{.highlight} мощь R Markdown для анализа данных и создания воспроизводимых отчетов.
+
+### Основные преимущества использованного подхода:
+
+1.  **Динамические вычисления** - все числа и графики обновляются автоматически
+2.  **Гибкое форматирование** - использование CSS для стилизации
+3.  **Интеграция кода и текста** - seamless сочетание анализа и выводов
+4.  **Воспроизводимость** - отчет можно легко обновить с новыми данными
+
+Общее количество обработанных записей: `r sum(films_df$Количество.персонажей)` упоминаний персонажей между `r nrow(films_df)` фильмов.
+
+<center>***Конец отчета***</center>
