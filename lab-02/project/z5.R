@@ -54,3 +54,4 @@ area(circle_param)    # 78.53982
 area(rectangle_param) # 24
 area(triangle_param)  # 6
 area(invalid_param)   # Предупреждение и NA
+

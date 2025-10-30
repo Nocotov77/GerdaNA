@@ -60,3 +60,4 @@ calculate_polygon_area <- function() {
 
 # Запуск программы
 calculate_polygon_area()
+
