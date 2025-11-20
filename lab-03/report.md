@@ -1,4 +1,5 @@
-# **Отчёт по лабораторной работе**
+
+# **Отчёт по лабораторной работе №3**
 **Тема:** Организация рабочего окружения и работа с Git. Стратегии ветвления и автоматизация контроля качества.
 
 ## Сведения о студенте
@@ -133,14 +134,20 @@ GerdaNA/
 ├──lab02
 ├──lab03
     ├── project
+        ├── greeting.py
+        └── hello.py
     ├── report
+        └── screen.png
     ├── report.md
     └── task.md
 ├── .pre-commit-config.yaml
 ```
 
 ### **Ссылка на репозиторий:**
-[GitHub Repository Link](https://github.com/git stut)
+[GitHub Repository Link](https://github.com/Nocotov77/GerdaNA)
+
+### **Скриншоты:** 
+![pre-commit](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-03/report/screen.png)
 
 ---
 
