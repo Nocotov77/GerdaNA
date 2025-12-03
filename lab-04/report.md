@@ -82,7 +82,7 @@ class Employee:
 - Переопределены методы расчета зарплат
 
 ### Диаграмма классов
-[Вставить UML-диаграмму иерархии классов]
+![UML](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-04/report/uml.png)
 
 ### Пример использования
 ```python
@@ -194,7 +194,7 @@ class Project:
 ## Приложения
 
 ### Приложение A: UML-диаграммы классов
-[Диаграммы полной системы]
+![UML](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-04/report/uml.png)
 
 ---
 
