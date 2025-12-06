@@ -237,6 +237,6 @@ class HireEmployeeCommand(Command):
 
 
 ## Приложения
-- **Исходный код:** [Полный код реализации системы](lab3_patterns.py) (все 13 паттернов)
-- **Диаграммы:** UML диаграмма классов системы с паттернами
+- **Исходный код:** [Полный код реализации системы](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-05/project/sourcecode.py) (все 13 паттернов)
+- **Диаграммы:** [UML диаграмма классов системы с паттернами](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-05/report/uml.png)
 - **Дополнительные материалы:** Примеры использования каждого паттерна в демонстрационной функции
