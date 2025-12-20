@@ -1,2 +1,0 @@
-FAIL	./internal/async/... [setup failed]
-FAIL

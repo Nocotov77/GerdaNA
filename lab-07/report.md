@@ -428,4 +428,4 @@ Go предоставляет:
 - [Go Concurrency Patterns](https://www.youtube.com/watch?v=f6kdp27TYZs)
 - [Advanced Go Concurrency Patterns](https://www.youtube.com/watch?v=QDDwwePbDtw)
 - [The Go Memory Model](https://golang.org/ref/mem)
-- ![Скриншот терминала]()
+- ![Скриншот терминала](https://raw.githubusercontent.com/Nocotov77/GerdaNA/main/lab-07/report/terminal.png)
